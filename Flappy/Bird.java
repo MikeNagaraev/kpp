@@ -2,7 +2,7 @@ package my_crazy_bird;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
+/**Class Bird*/
 public class Bird {
   private Image frames[];
   private ImageView ImageOfFlappyBird = new ImageView();
@@ -20,6 +20,7 @@ public class Bird {
         birdImgs[i] = new Image(getClass().getResourceAsStream("birdFrame" + i + ".png"));
       }
     } catch (Exception e) {
+        System.err.println("Caught IOException: " +  e.getMessage());
         return;
       }
     this.frames = birdImgs;
@@ -50,3 +51,4 @@ public class Bird {
   }
 
 }
+

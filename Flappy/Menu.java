@@ -1,6 +1,8 @@
 
-// My Game FlappyBird written by Java with JavaFX 
-// Developer is Mikhail N.
+/**
+ * My Game FlappyBird written by Java with JavaFX 
+ * @author Mikhail N.
+ */
 
 package my_crazy_bird;
 
@@ -38,23 +40,33 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/** class Menu */
 public class Menu extends Application {
 
-  private static Stage stage; // Declaration of Stage
-  private static Scene scene; // Declaration of Scene
+  /** Declaration of Stage */
+  private static Stage stage; 
+  /** Declaration of Scene */
+  private static Scene scene;  
 
-  public static final int W = 900; // Width of Window
-  public static final int H = 500; // Height of Window
+  /**Width of Window*/
+  public static final int W = 900; 
+  /**Height of Window*/
+  public static final int H = 500;  
 
-  public static SubMenu mainMenu; // SubMenu for MenuItems
-  public static MenuBox menuBox; // MenuBox for SubMenu
-
-  static NewGameInterface gi = new NewGameInterface(); // Declaration of new GamePlaying Process
-  public static Rating rating = new Rating(); // Declaration of Result of Game
-
-  static MediaPlayer mediaPlayer, soundPlayer; // For music and sounds
-  static Slider volumeslider = new Slider(); // For volume managing
-  static double level_Of_volume = 0.2; // Initial level of volume
+  /**SubMenu for MenuItems*/
+  public static SubMenu mainMenu; 
+  /**MenuBox for SubMenu*/
+  public static MenuBox menuBox;  
+  /**Declaration of new GamePlaying Process*/
+  static NewGameInterface gi = new NewGameInterface();  
+  /**Declaration of Result of Game*/
+  public static Rating rating = new Rating(); 
+  /**For music and sounds*/
+  static MediaPlayer mediaPlayer, soundPlayer; 
+  /**For volume managing*/
+  static Slider volumeslider = new Slider(); 
+  /**Initial level of volume*/
+  static double level_Of_volume = 0.2;  
   public static ButtonVolume btn_volume;
 
   public static final int EASYMODE = 0;
@@ -86,20 +98,21 @@ public class Menu extends Application {
     primaryStage.show();
   }
 
-  // Pushing items on Pane
+  /** Pushing items on Pane */
 
   public static Parent createContent() {
 
-    Pane root = new Pane(); // Declaration of Pane
+    Pane root = new Pane();
     root.setPrefSize(W, H);
-    // Add a Color YELLOW to Pane	
+    /** Add a Color YELLOW to Pane	*/
     root.setStyle("-fx-background-color: #FFFF00"); 
-    // Create rectangle for Dividing pane on 2 parts
+    /** Create rectangle for Dividing pane on 2 parts */
     Rectangle rect = new Rectangle(W, H / 2); 
-    rect.setFill(Color.CYAN); // Add a Color BLUE to Pane
+    /** Add a Color BLUE to Pane*/
+    rect.setFill(Color.CYAN); 
     rect.setTranslateX(0);
     rect.setTranslateY(H / 2);
-
+    /**Creating title in Menu*/
     Title title = new Title(MENU_TITLE); // Creating title in Menu
 
     MenuItem newGame = new MenuItem("NEW GAME");
@@ -120,13 +133,13 @@ public class Menu extends Application {
     MenuItem difficultResult = new MenuItem("BEST DIFFICULT :" + Rating.getResult(HARDMODE));
     MenuItem Back = new MenuItem("BACK");
     SubMenu statisticsMenu = new SubMenu();
-    statisticsMenu.addMenu(	easyResult, normalResult, difficultResult,Back);
+    statisticsMenu.addMenu( easyResult, normalResult, difficultResult,Back);
+    /** Initial Setting a MainMenu*/
+    menuBox = new MenuBox(mainMenu);
 
-    menuBox = new MenuBox(mainMenu);// Initial Setting a MainMenu
+    /**Setting a handlers for special MenuItems*/
 
-    // Setting a handlers for special MenuItems
-
-    // Loading MenuItems of NewGame
+    /** Loading MenuItems of NewGame*/
     newGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         menuBox.setSubMenu(newGameMenu);
@@ -139,28 +152,29 @@ public class Menu extends Application {
         humanPlaying = false;
       }
     });
-    // Loading MenuItems of StatisticsMenu
+    /** Loading MenuItems of StatisticsMenu*/
     statistics.setOnMouseClicked(event -> {
       menuBox.setSubMenu(statisticsMenu);
     }); 
     exitGame.setOnMouseClicked(event -> System.exit(0)); // Exit from Game
-    // Return to MainMenu
+    /** Return to MainMenu*/
     Back.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
     }); 
-    // Return to MainMenu
+    /** Return to MainMenu*/
     complexBack.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
     });
-    
-    playMainTheme(); // Playing music in Main Menu
-
-    btn_volume = new ButtonVolume(); // Creating Button volume
-    btn_volume.checkAction(); // Calling a method which check action with this button
-
-    initializeVolumeSlider(); // Add settings to volumeController
-
-    checkOnstartGame(easy, normal, difficult); // Check strart NewGame
+    /** Playing music in Main Menu*/
+    playMainTheme(); 
+    /**Creating Button volume*/
+    btn_volume = new ButtonVolume(); 
+    /**Calling a method which check action with this button*/
+    btn_volume.checkAction(); 
+    /**Add settings to volumeController*/
+    initializeVolumeSlider();  
+    /**Check start NewGame*/
+    checkOnstartGame(easy, normal, difficult); 
 
     root.getChildren().addAll(rect, menuBox, title, btn_volume, volumeslider, getImageOfBird());
     return root;
@@ -183,27 +197,30 @@ public class Menu extends Application {
     });
   }
 
-  private static void checkOnstartGame(	MenuItem easy, MenuItem normal, MenuItem difficult) {
+  private static void checkOnstartGame(	MenuItem easy, MenuItem normal,	MenuItem difficult) {
     easy.setOnMouseClicked(new EventHandler<MouseEvent>() {
        public void handle(MouseEvent mE) {
          mediaPlayer.stop();
-         gi.startGame(stage, W, H, EASYMODE, humanPlaying); // Start newGame in Easy Way
+         /** Start newGame in Easy Way*/
+         gi.startGame(stage, W, H, EASYMODE, humanPlaying);
         }
      });
     normal.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
-        gi.startGame(stage, W, H, NORMALMODE, humanPlaying);// Start newGame in Normal Way
+        /** Start newGame in Normal Way*/
+        gi.startGame(stage, W, H, NORMALMODE, humanPlaying);
       }
     });
     difficult.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
-        gi.startGame(stage, W, H, HARDMODE, humanPlaying); // Start newGame in Hard Way
+        /** Start newGame in Hard Way*/
+        gi.startGame(stage, W, H, HARDMODE, humanPlaying);
       }
     });
   }
-
+  /**Playing music*/
   private static void playMainTheme() {
     String path = MAIN_THEME;
     Media media = new Media(new File(path).toURI().toString());
@@ -226,7 +243,7 @@ public class Menu extends Application {
     double increase = 1.1;
 
     ImageView imgMainBird;
-
+    /** Loading bird in Main Menu*/
     try (InputStream is = Files.newInputStream(Paths.get(BIRD_MAIN))) {
       imgMainBird = new ImageView(new Image(is));
       imgMainBird.setFitWidth(sizeOfMainBird[0]);
@@ -275,12 +292,13 @@ public class Menu extends Application {
         rt.play();
       });
     } catch (IOException e) {
-        System.err.println("Caught IOException: " +  e.getMessage());}
-        return;
+        System.err.println("Caught IOException: " +  e.getMessage());
+        return null;
     }
     return imgMainBird;
   }
 
+  /** class ButtonVolume*/
   private static class ButtonVolume extends Button {
     ImageView imgVolumeButton;
     double sizeOfButton = H / 25;
@@ -298,7 +316,7 @@ public class Menu extends Application {
         setTranslateY(coordOfButton[1]);
         setGraphic(imgVolumeButton);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage());}
+          System.err.println("Caught IOException: " +  e.getMessage());
           return;
       }
     }
@@ -309,7 +327,7 @@ public class Menu extends Application {
         imgVolumeButton.setFitWidth(sizeOfButton);
         setGraphic(imgVolumeButton);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage());}
+          System.err.println("Caught IOException: " +  e.getMessage());
           return;
       }
     }
@@ -324,6 +342,7 @@ public class Menu extends Application {
           return;
       }
     }
+    /** Checking on action from button*/
     public void checkAction() {
       if (level_Of_volume > 0) {
         loadVolumePng();

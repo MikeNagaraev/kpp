@@ -26,7 +26,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+/**Class NewGameInterface*/
 public class NewGameInterface {
 
   public Stage gamestage;
@@ -88,7 +88,7 @@ public class NewGameInterface {
     humanPlaying = _hp;
     gamestage = stage;
     modeOfGame = m;
-    
+    /**Checking on easy,etc. game*/
     checkOnMode();
 
     timer = new AnimationTimer() {
@@ -97,6 +97,7 @@ public class NewGameInterface {
         update();
       }
     };
+    /**start time*/
     timer.start();
     newGameContent();
     
@@ -106,6 +107,7 @@ public class NewGameInterface {
         backToMenu();
       }
     });
+    /**checking for pause*/
     scene.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.F10) {
         if (pauseGame) {
@@ -153,7 +155,7 @@ public class NewGameInterface {
       } 
     }
   }
-
+  /**printing finish result*/
   private void printResult() {
 
     int[] sizeOfresultPane = {
@@ -247,7 +249,7 @@ public class NewGameInterface {
   private String getString(int a) {
     return "" + a;
   }
-
+  /**Save and Read in file*/
   private void checkResultAndWrite() {
     if (Rating.getResult(modeOfGame).length() < getString(score).length()) {
       Rating.setResult(getString(score), modeOfGame);
@@ -259,7 +261,7 @@ public class NewGameInterface {
       }
     }
   }
-
+   /**printing pause message*/
   private void printPause() {
 
     int number_of_msgs = 2;
@@ -283,7 +285,7 @@ public class NewGameInterface {
       appRoot.getChildren().addAll(pauseText[i]);
     }
   }
-
+  /**back to menu*/
   private void backToMenu() {
     timer.stop();
     wallsPassed = 0;
@@ -292,7 +294,7 @@ public class NewGameInterface {
     gamestage.setScene(new Scene(Menu.createContent()));
     gamestage.show();
   }
-
+  /**setting a pause*/
   private void pauseGame() {
     if (!pauseGame) {
       timer.stop();
@@ -302,7 +304,7 @@ public class NewGameInterface {
       pauseGame = true;
     }
   }
-
+  /**Pushing items to Scene*/
   private void newGameContent() {
 
     int[] rateOfJump = {
@@ -330,7 +332,7 @@ public class NewGameInterface {
     appRoot.getChildren().addAll(bird.getGraphics(), scoreLabel);
     intitalAddingItemesToGame();
   }
-
+   /**Update in game*/
   public void update() {
 
     double rateOfSun = 0.3;
@@ -348,7 +350,7 @@ public class NewGameInterface {
         break;
       }
     }
-
+    /**Creating a clouds*/
     for (int i = 0; i < NUMBER_OF_CLOUDS; i++) {
       if (cloud[i].getTranslateX() + cloud[i].getFitWidth() < 0){
         cloud[i].setTranslateX(width);
@@ -371,7 +373,7 @@ public class NewGameInterface {
 
     checkColission();
   }
-  
+  /**adding wall*/
   void addWall(){       
 
     int rangeOfWallHeight = 4 * height / 5 - hole;
@@ -405,7 +407,7 @@ public class NewGameInterface {
 
     appRoot.getChildren().addAll(wTop, wDown);
   }
-
+   /**Check Bird collision with ground,walls,sky, etc.*/
   void checkColission() {
     
     int boundOfGroundY = 4 * height / 5;
@@ -414,8 +416,7 @@ public class NewGameInterface {
     if (!humanPlaying){
        checkColissionForBot();
     }
-
-       // With LeftSide
+       /** With LeftSide */
     if (bird.getGraphics().getBoundsInParent()
         .intersects(walls.get(wallsPassed).getBoundsInParent())
         || bird.getGraphics().getBoundsInParent()
@@ -425,7 +426,7 @@ public class NewGameInterface {
           printResult();
           return;
     }
-      // With top and bottom of walls
+      /** With top and bottom of walls*/
     if (bird.getGraphics().getTranslateX() >= 
         walls.get(wallsPassed).getTranslateX()
         && bird.getGraphics().getTranslateX() <= 
@@ -443,7 +444,7 @@ public class NewGameInterface {
           printResult();
           return;
     }
-      // Incrementing Score
+      /** Incrementing Score*/
     if (bird.getGraphics().getTranslateX() >= 
         walls.get(wallsPassed).getTranslateX()+ wallWidth
         && bird.getGraphics().getTranslateX() >= 
@@ -453,23 +454,23 @@ public class NewGameInterface {
           wallsPassed+=2;
           return;
     }
-     // With ground
-     if (bird.getGraphics().getTranslateY()+ bird.getHeight() > 
-         boundOfGroundY) {
-           timer.stop();
-           fall.stop();
-           gameOver = true;
-           printResult();
-           return;
+     /** With ground*/
+    if (bird.getGraphics().getTranslateY()+ bird.getHeight() > 
+        boundOfGroundY) {
+          timer.stop();
+          fall.stop();
+          gameOver = true;
+          printResult();
+          return;
     }
-    // With UP
+    /** With Sky*/
     if (bird.getGraphics().getTranslateY() < 0) {
           bird.getGraphics().setTranslateY(bird.getGraphics().getTranslateY() - 2);
           fall.play();
           return;
-    }
-  }
-
+     }
+}
+  /** ckeck collision for bot*/
   void checkColissionForBot() {
     if (bird.getGraphics().getTranslateY() + hole / 2 >
         walls.get(wallsPassed + 1).GetTop()) {
@@ -477,7 +478,7 @@ public class NewGameInterface {
           return;
     }
   }
-
+  /** refresh items and pushing again*/
   void intitalAddingItemesToGame() {
 
     double[] coordOfBird = {
@@ -513,12 +514,12 @@ public class NewGameInterface {
       sun.setFitHeight(sizeOfSun[1]);
       sun.setOpacity(0.6);
     } catch (IOException e) {
-         System.err.println("Caught IOException: " +  e.getMessage());}
+         System.err.println("Caught IOException: " +  e.getMessage());
          return;
     }
     appRoot.getChildren().addAll(sun);
 
-    // Setting a layout of clouds
+    /** Setting a layout of clouds */
     for (int i = 0; i < NUMBER_OF_CLOUDS; i++) {
       try (InputStream is = Files.newInputStream(Paths.get(CLOUD_PICTURE))) {
         cloud[i] = new ImageView(new Image(is));
@@ -529,12 +530,12 @@ public class NewGameInterface {
         cloud[i].setOpacity(0.6);
         appRoot.getChildren().addAll(cloud[i]);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage());}
+          System.err.println("Caught IOException: " +  e.getMessage());
           return;
       }
     }
-        
-    // Setting a layout of walls
+          
+    /** Setting a layout of walls*/
     numberWalls=0;
     for (int i = 0; i < NUMBER_OF_WALLS; i++) {
       addWall();
@@ -550,7 +551,7 @@ public class NewGameInterface {
       groundview.setFitWidth(width);
       groundview.setFitHeight(height / 5);
     } catch (IOException e) {
-        System.err.println("Caught IOException: " +  e.getMessage());}
+        System.err.println("Caught IOException: " +  e.getMessage());
         return;
     }
 
@@ -576,7 +577,7 @@ public class NewGameInterface {
     timer.start();
     appRoot.getChildren().addAll( groundview, bird.getGraphics(),scoreLabel, helpTextDown);
   }
-
+  /** Jump method for bird*/
   private void jumpflappy() {
     int rotateAngleFall = 40;
     int rotateAngleJump = -40;

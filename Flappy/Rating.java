@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-
+/**class Rating*/
 public class Rating {
 
   public static String fileName;
@@ -50,7 +50,7 @@ public class Rating {
       }
       in.close();
     } catch (IOException e) {
-        System.err.println("Caught IOException: " +  e.getMessage());}
+        System.err.println("Caught IOException: " +  e.getMessage());
     }
     return s;
   }
