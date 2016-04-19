@@ -12,59 +12,61 @@ public class Replay {
   int numberLines = 2;
   final int startingLine = 2;
   final double shift = 0.0001;
-  FileWorking fw = new FileWorking(); 
+  FileWorking fw = new FileWorking();
   ReplayEnum re;
   Timer time = new java.util.Timer();
   NewGameInterface newGame;
   public AnimationTimer timer;
-  
-  
-  
-  public void start(NewGameInterface ng){
-      newGame = ng;
-      counterOfTime = 0;
-      newGame.flagExit = false;
-      
-      timer = new AnimationTimer() {
-        @Override public void handle(long now) {
-                if(newGame.flagStop){
-                  check();
-                  counterOfTime = counterOfTime + shift;
-                }
+
+
+
+  public void start(NewGameInterface ng) {
+    newGame = ng;
+    counterOfTime = 0;
+    newGame.flagExit = false;
+
+    timer = new AnimationTimer() {
+      @Override
+      public void handle(long now) {
+        if (newGame.flagStop) {
+          check();
+          counterOfTime = counterOfTime + shift;
         }
-      };
-      timer.start();
+      }
+    };
+    timer.start();
   }
-  
-  private void check(){
-    String[] line = fw.getLine(REPLAY_TXT,numberLines);
-    if(line[0].equals(ReplayEnum.getType(ReplayEnum.TIME))){
+
+  private void check() {
+    String[] line = fw.getLine(REPLAY_TXT, numberLines);
+    if (line[0].equals(ReplayEnum.getType(ReplayEnum.TIME))) {
       timeFunc(line);
     }
   }
-  public void refreshReplay(){
+
+  public void refreshReplay() {
     counterOfTime = 0;
     numberLines = startingLine;
     newGame.flagStop = false;
     timer.stop();
   }
-  
-  private void timeFunc(String[] line){
+
+  private void timeFunc(String[] line) {
     double fileTime = Double.parseDouble(line[1]);
-    if(counterOfTime >= fileTime){
+    if (counterOfTime >= fileTime) {
       numberLines++;
-      String[] currentline = fw.getLine(REPLAY_TXT,numberLines);
-      if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.WALL))){
+      String[] currentline = fw.getLine(REPLAY_TXT, numberLines);
+      if (currentline[0].equals(ReplayEnum.getType(ReplayEnum.WALL))) {
         newGame.addWallFromReplay(numberLines);
         numberLines += 2;
-      }else if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.FLAPPY))){
+      } else if (currentline[0].equals(ReplayEnum.getType(ReplayEnum.FLAPPY))) {
         newGame.jumpflappy();
         numberLines++;
-      }else if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.ESC))){
-         refreshReplay();
-         newGame.flagExit = true;
-      }else if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.GAMEOVER))){
-         numberLines++;
+      } else if (currentline[0].equals(ReplayEnum.getType(ReplayEnum.ESC))) {
+        refreshReplay();
+        newGame.flagExit = true;
+      } else if (currentline[0].equals(ReplayEnum.getType(ReplayEnum.GAMEOVER))) {
+        numberLines++;
       }
     }
   }
