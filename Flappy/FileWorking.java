@@ -64,7 +64,7 @@ public class FileWorking {
     int maxwords = 3;
     String s = new String();
     String splitString[] = new String[maxwords];
-    double coordAndHeight[] = new double[maxwords-1];
+    double[] coordAndHeight = new double[maxwords-1];
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
       for(int i = 0; i < line; i++){
