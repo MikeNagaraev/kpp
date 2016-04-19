@@ -11,16 +11,16 @@ public class Replay {
   double counterOfTime = 0;
   int numberLines = 2;
   final int startingLine = 2;
-  final double shift = 0.0001;
+  final double shift = 0.001;
   FileWorking fw = new FileWorking();
   ReplayEnum re;
   Timer time = new java.util.Timer();
-  NewGameInterface newGame;
+  Game newGame;
   public AnimationTimer timer;
 
 
 
-  public void start(NewGameInterface ng) {
+  public void start(Game ng) {
     newGame = ng;
     counterOfTime = 0;
     newGame.flagExit = false;
