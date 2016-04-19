@@ -6,7 +6,7 @@ import java.util.TimerTask;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 
-public class Replay{
+public class Replay {
   public static final String REPLAY_TXT = "replay.txt";
   double counterOfTime = 0;
   int numberLines = 2;
@@ -56,7 +56,7 @@ public class Replay{
       String[] currentline = fw.getLine(REPLAY_TXT,numberLines);
       if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.WALL))){
         newGame.addWallFromReplay(numberLines);
-        numberLines+=2;
+        numberLines += 2;
       }else if(currentline[0].equals(ReplayEnum.getType(ReplayEnum.FLAPPY))){
         newGame.jumpflappy();
         numberLines++;
