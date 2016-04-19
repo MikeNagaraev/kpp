@@ -59,7 +59,7 @@ public class Menu extends Application {
   /** MenuBox for SubMenu */
   public static MenuBox menuBox;
   /** Declaration of new GamePlaying Process */
-  static NewGameInterface gi = new NewGameInterface();
+  static Game game = new Game();
   /** Declaration of Result of Game */
   public static Rating rating = new Rating();
   /** For music and sounds */
@@ -167,7 +167,7 @@ public class Menu extends Application {
         humanPlaying = true;
         mediaPlayer.stop();
         int mode = 0;
-        gi.startGame(stage, W, H, mode, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, mode, humanPlaying, replayGameis);
       }
     });
 
@@ -223,7 +223,7 @@ public class Menu extends Application {
         /** Start newGame in Easy Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), EASYMODE, REPLAY_TXT);
-        gi.startGame(stage, W, H, EASYMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, EASYMODE, humanPlaying, replayGameis);
       }
     });
     normal.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -232,7 +232,7 @@ public class Menu extends Application {
         /** Start newGame in Normal Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), NORMALMODE, REPLAY_TXT);
-        gi.startGame(stage, W, H, NORMALMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, NORMALMODE, humanPlaying, replayGameis);
       }
     });
     difficult.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -241,15 +241,14 @@ public class Menu extends Application {
         /** Start newGame in Hard Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), HARDMODE, REPLAY_TXT);
-        gi.startGame(stage, W, H, HARDMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, HARDMODE, humanPlaying, replayGameis);
       }
     });
   }
 
   /** Playing music */
   private static void playMainTheme() {
-    String path = MAIN_THEME;
-    Media media = new Media(new File(path).toURI().toString());
+    Media media = new Media(new File(MAIN_THEME).toURI().toString());
     mediaPlayer = new MediaPlayer(media);
     mediaPlayer.setAutoPlay(true);
     mediaPlayer.setVolume(levelOfVolume);
@@ -299,8 +298,7 @@ public class Menu extends Application {
         int Rduration = 90;
         double volume = 0.1;
 
-        String path = PETUH_SOUND;
-        Media mediaSound = new Media(new File(path).toURI().toString());
+        Media mediaSound = new Media(new File(PETUH_SOUND).toURI().toString());
         soundPlayer = new MediaPlayer(mediaSound);
         soundPlayer.setVolume(volume);
         soundPlayer.play();

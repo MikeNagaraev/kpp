@@ -29,7 +29,8 @@ public class FileWorking {
 
   public String[] getLine(String fileName, int line) {
     File file = new File(fileName);
-    String s = new String(), splitString[] = new String[4];
+    String s = new String();
+    String[] splitString = new String[4];
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
       for (int i = 0; i < line; i++) {
@@ -45,7 +46,8 @@ public class FileWorking {
 
   public int readModeFromFile(String fileName) {
     File file = new File(fileName);
-    String s = new String(), splitString[] = new String[2];
+    String s = new String();
+    String[] splitString = new String[2];
     int modeInFile = 0;
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
@@ -63,7 +65,7 @@ public class FileWorking {
     File file = new File(fileName);
     int maxWords = 3;
     String s = new String();
-    String splitString[] = new String[maxWords];
+    String[] splitString = new String[maxWords];
     double[] coordAndHeight = new double[maxWords - 1];
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
@@ -132,11 +134,7 @@ public class FileWorking {
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
       s = in.readLine();
-      if (s == null) {
-        fileIsNotEmpty = false;
-      } else {
-        fileIsNotEmpty = true;
-      }
+      fileIsNotEmpty = (s == null) ? false:true;
       in.close();
     } catch (IOException e) {
       System.err.println("Caught IOException: " + e.getMessage());
