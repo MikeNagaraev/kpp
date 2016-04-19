@@ -142,19 +142,20 @@ public class NewGameInterface {
     /**checking for pause*/
     scene.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.F10) {
-        if (pauseGame) {
-          appRoot.getChildren().removeAll(pauseText[0], pauseText[1]);
-          pauseGame = false;
-          if(replayGame){
-            replay.timer.start();
+        if (!gameOver) {
+          if (pauseGame) {
+            appRoot.getChildren().removeAll(pauseText[0], pauseText[1]);
+            pauseGame = false;
+            if(replayGame){
+              replay.timer.start();
+            }
+            fall.play();
+            rotator.play();
+            timer.start();
+          }else{
+            printPause();
+            pauseGame();
           }
-          fall.play();
-          rotator.play();
-          timer.start();
-        
-        }else{
-          printPause();
-          pauseGame();
         }
       }
     });
@@ -401,7 +402,7 @@ public class NewGameInterface {
         wallsPassed--;
         numberWalls--;
         //two walls passed
-        if(numberWalls%2 == 0){
+        if(numberWalls % 2 == 0){
           if(!replayGame){
             addWall();
           }
@@ -478,8 +479,8 @@ public class NewGameInterface {
         heightTop = maxHeight;
     }
     int heightDown = rangeOfWallHeight - heightTop;
-    if(score%4 ==0 && score > 0){
-      heightTop = new Random().nextInt(500);
+    if(score % 4 == 0 && score > 0){
+      heightTop = new Random().nextInt(400);
     }
     if (heightTop < minHeight){
       heightTop = minHeight;
@@ -577,7 +578,7 @@ public class NewGameInterface {
 }
   /** check collision for bot*/
   void checkColissionForBot() {
-    if (bird.getGraphics().getTranslateY() + hole /3 >
+    if (bird.getGraphics().getTranslateY() + hole /2 >
         walls.get(wallsPassed + 1).getTop()) {
         jumpflappy();
         return;
