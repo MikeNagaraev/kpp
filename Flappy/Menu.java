@@ -74,6 +74,8 @@ public class Menu extends Application {
   public static final int HARDMODE = 2;
 
   public static boolean humanPlaying = true;
+  
+  public static boolean replayGameis = false;
 
   public final static String STYLE = "Style.css";
   public final static String TITLE = "Crazy bird";
@@ -83,6 +85,9 @@ public class Menu extends Application {
   public final static String MAIN_THEME = "maintheme.mp3";
   public final static String VOLUME_PNG = "volume.png";
   public final static String NOT_VOLUME_PNG = "notvolume.png";
+  public final static String REPLAY_TXT = "replay.txt";
+ 
+  public static FileWorking fw = new FileWorking();
 
   public static void main(String[] args) {
     launch(args);
@@ -91,6 +96,7 @@ public class Menu extends Application {
   @Override public void start(Stage primaryStage) throws Exception {
 
     stage = primaryStage;
+    primaryStage.setResizable(false);
     scene = new Scene(createContent(), W, H); // Creating Scene
     scene.getStylesheets().add(getClass().getResource(STYLE).toExternalForm());
     primaryStage.setTitle(TITLE);
@@ -107,7 +113,7 @@ public class Menu extends Application {
     /** Add a Color YELLOW to Pane	*/
     root.setStyle("-fx-background-color: #FFFF00"); 
     /** Create rectangle for Dividing pane on 2 parts */
-    Rectangle rect = new Rectangle(W, H / 2); 
+    Rectangle rect = new Rectangle(W + W/18, H / 2 + H/10); 
     /** Add a Color BLUE to Pane*/
     rect.setFill(Color.CYAN); 
     rect.setTranslateX(0);
@@ -117,10 +123,11 @@ public class Menu extends Application {
 
     MenuItem newGame = new MenuItem("NEW GAME");
     MenuItem botGame = new MenuItem("BOT GAME");
+    MenuItem replayGame = new MenuItem("REPLAY");
     MenuItem statistics = new MenuItem("RATING");
     MenuItem exitGame = new MenuItem("EXIT");
-    mainMenu = new SubMenu(newGame, botGame, statistics, exitGame); // Adding to
-
+    mainMenu = new SubMenu(newGame, botGame,replayGame, statistics, exitGame);
+    
     MenuItem easy = new MenuItem("EASY");
     MenuItem normal = new MenuItem("NORMAL");
     MenuItem difficult = new MenuItem("HARD");
@@ -133,7 +140,7 @@ public class Menu extends Application {
     MenuItem difficultResult = new MenuItem("BEST DIFFICULT :" + Rating.getResult(HARDMODE));
     MenuItem Back = new MenuItem("BACK");
     SubMenu statisticsMenu = new SubMenu();
-    statisticsMenu.addMenu( easyResult, normalResult, difficultResult,Back);
+    statisticsMenu.addMenu(easyResult, normalResult, difficultResult,Back);
     /** Initial Setting a MainMenu*/
     menuBox = new MenuBox(mainMenu);
 
@@ -152,11 +159,23 @@ public class Menu extends Application {
         humanPlaying = false;
       }
     });
+    replayGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
+      public void handle(MouseEvent me) {
+        replayGameis = true;
+        humanPlaying = true;
+        mediaPlayer.stop();
+        int mode = 0;
+        gi.startGame(stage, W, H, mode, humanPlaying,replayGameis);
+      }
+    });
+    
     /** Loading MenuItems of StatisticsMenu*/
     statistics.setOnMouseClicked(event -> {
       menuBox.setSubMenu(statisticsMenu);
     }); 
-    exitGame.setOnMouseClicked(event -> System.exit(0)); // Exit from Game
+    exitGame.setOnMouseClicked(event -> {
+      System.exit(0);
+    }); // Exit from Game
     /** Return to MainMenu*/
     Back.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
@@ -202,21 +221,27 @@ public class Menu extends Application {
        public void handle(MouseEvent mE) {
          mediaPlayer.stop();
          /** Start newGame in Easy Way*/
-         gi.startGame(stage, W, H, EASYMODE, humanPlaying);
+         replayGameis = false;
+         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),EASYMODE, REPLAY_TXT);
+         gi.startGame(stage, W, H, EASYMODE, humanPlaying,replayGameis);
         }
      });
     normal.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
         /** Start newGame in Normal Way*/
-        gi.startGame(stage, W, H, NORMALMODE, humanPlaying);
+        replayGameis = false;
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),NORMALMODE, REPLAY_TXT);
+        gi.startGame(stage, W, H, NORMALMODE, humanPlaying,replayGameis);
       }
     });
     difficult.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
         /** Start newGame in Hard Way*/
-        gi.startGame(stage, W, H, HARDMODE, humanPlaying);
+        replayGameis = false;
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),HARDMODE, REPLAY_TXT);
+        gi.startGame(stage, W, H, HARDMODE, humanPlaying,replayGameis);
       }
     });
   }
@@ -369,7 +394,7 @@ public class Menu extends Application {
   }
 
   private static class SubMenu extends VBox {
-    int spacing = 25;
+    int spacing = 15;
     public SubMenu(MenuItem... items) {
       setSpacing(spacing);
       setLayoutX(W / 3);
