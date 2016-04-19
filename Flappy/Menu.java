@@ -1,6 +1,7 @@
 
 /**
- * My Game FlappyBird written by Java with JavaFX 
+ * My Game FlappyBird written by Java with JavaFX
+ * 
  * @author Mikhail N.
  */
 
@@ -44,29 +45,29 @@ import javafx.util.Duration;
 public class Menu extends Application {
 
   /** Declaration of Stage */
-  private static Stage stage; 
+  private static Stage stage;
   /** Declaration of Scene */
-  private static Scene scene;  
+  private static Scene scene;
 
-  /**Width of Window*/
-  public static final int W = 900; 
-  /**Height of Window*/
-  public static final int H = 500;  
+  /** Width of Window */
+  public static final int W = 900;
+  /** Height of Window */
+  public static final int H = 500;
 
-  /**SubMenu for MenuItems*/
-  public static SubMenu mainMenu; 
-  /**MenuBox for SubMenu*/
-  public static MenuBox menuBox;  
-  /**Declaration of new GamePlaying Process*/
-  static NewGameInterface gi = new NewGameInterface();  
-  /**Declaration of Result of Game*/
-  public static Rating rating = new Rating(); 
-  /**For music and sounds*/
-  static MediaPlayer mediaPlayer, soundPlayer; 
-  /**For volume managing*/
-  static Slider volumeslider = new Slider(); 
-  /**Initial level of volume*/
-  static double levelOfVolume = 0.2;  
+  /** SubMenu for MenuItems */
+  public static SubMenu mainMenu;
+  /** MenuBox for SubMenu */
+  public static MenuBox menuBox;
+  /** Declaration of new GamePlaying Process */
+  static NewGameInterface gi = new NewGameInterface();
+  /** Declaration of Result of Game */
+  public static Rating rating = new Rating();
+  /** For music and sounds */
+  static MediaPlayer mediaPlayer, soundPlayer;
+  /** For volume managing */
+  static Slider volumeslider = new Slider();
+  /** Initial level of volume */
+  static double levelOfVolume = 0.2;
   public static ButtonVolume btnVolume;
 
   public static final int EASYMODE = 0;
@@ -74,7 +75,7 @@ public class Menu extends Application {
   public static final int HARDMODE = 2;
 
   public static boolean humanPlaying = true;
-  
+
   public static boolean replayGameis = false;
 
   public final static String STYLE = "Style.css";
@@ -86,14 +87,15 @@ public class Menu extends Application {
   public final static String VOLUME_PNG = "volume.png";
   public final static String NOT_VOLUME_PNG = "notvolume.png";
   public final static String REPLAY_TXT = "replay.txt";
- 
+
   public static FileWorking fw = new FileWorking();
 
   public static void main(String[] args) {
     launch(args);
   }
 
-  @Override public void start(Stage primaryStage) throws Exception {
+  @Override
+  public void start(Stage primaryStage) throws Exception {
 
     stage = primaryStage;
     primaryStage.setResizable(false);
@@ -110,15 +112,15 @@ public class Menu extends Application {
 
     Pane root = new Pane();
     root.setPrefSize(W, H);
-    /** Add a Color YELLOW to Pane	*/
-    root.setStyle("-fx-background-color: #FFFF00"); 
+    /** Add a Color YELLOW to Pane */
+    root.setStyle("-fx-background-color: #FFFF00");
     /** Create rectangle for Dividing pane on 2 parts */
-    Rectangle rect = new Rectangle(W + W/18, H / 2 + H/10); 
-    /** Add a Color BLUE to Pane*/
-    rect.setFill(Color.CYAN); 
+    Rectangle rect = new Rectangle(W + W / 18, H / 2 + H / 10);
+    /** Add a Color BLUE to Pane */
+    rect.setFill(Color.CYAN);
     rect.setTranslateX(0);
     rect.setTranslateY(H / 2);
-    /**Creating title in Menu*/
+    /** Creating title in Menu */
     Title title = new Title(MENU_TITLE); // Creating title in Menu
 
     MenuItem newGame = new MenuItem("NEW GAME");
@@ -126,33 +128,33 @@ public class Menu extends Application {
     MenuItem replayGame = new MenuItem("REPLAY");
     MenuItem statistics = new MenuItem("RATING");
     MenuItem exitGame = new MenuItem("EXIT");
-    mainMenu = new SubMenu(newGame, botGame,replayGame, statistics, exitGame);
-    
+    mainMenu = new SubMenu(newGame, botGame, replayGame, statistics, exitGame);
+
     MenuItem easy = new MenuItem("EASY");
     MenuItem normal = new MenuItem("NORMAL");
     MenuItem difficult = new MenuItem("HARD");
     MenuItem complexBack = new MenuItem("BACK");
     // Adding to NewGameMenu
-    SubMenu newGameMenu = new SubMenu(easy, normal, difficult,complexBack);
+    SubMenu newGameMenu = new SubMenu(easy, normal, difficult, complexBack);
 
     MenuItem easyResult = new MenuItem("BEST EASY :" + Rating.getResult(EASYMODE));
     MenuItem normalResult = new MenuItem("BEST NORMAL :" + Rating.getResult(NORMALMODE));
     MenuItem difficultResult = new MenuItem("BEST DIFFICULT :" + Rating.getResult(HARDMODE));
     MenuItem back = new MenuItem("BACK");
     SubMenu statisticsMenu = new SubMenu();
-    statisticsMenu.addMenu(easyResult, normalResult, difficultResult,back);
-    /** Initial Setting a MainMenu*/
+    statisticsMenu.addMenu(easyResult, normalResult, difficultResult, back);
+    /** Initial Setting a MainMenu */
     menuBox = new MenuBox(mainMenu);
 
-    /**Setting a handlers for special MenuItems*/
+    /** Setting a handlers for special MenuItems */
 
-    /** Loading MenuItems of NewGame*/
+    /** Loading MenuItems of NewGame */
     newGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         menuBox.setSubMenu(newGameMenu);
         humanPlaying = true;
-       }
-     });
+      }
+    });
     botGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent me) {
         menuBox.setSubMenu(newGameMenu);
@@ -165,44 +167,42 @@ public class Menu extends Application {
         humanPlaying = true;
         mediaPlayer.stop();
         int mode = 0;
-        gi.startGame(stage, W, H, mode, humanPlaying,replayGameis);
+        gi.startGame(stage, W, H, mode, humanPlaying, replayGameis);
       }
     });
-    
-    /** Loading MenuItems of StatisticsMenu*/
+
+    /** Loading MenuItems of StatisticsMenu */
     statistics.setOnMouseClicked(event -> {
       menuBox.setSubMenu(statisticsMenu);
-    }); 
+    });
     exitGame.setOnMouseClicked(event -> {
       System.exit(0);
     }); // Exit from Game
-    /** Return to MainMenu*/
+    /** Return to MainMenu */
     back.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
-    }); 
-    /** Return to MainMenu*/
+    });
+    /** Return to MainMenu */
     complexBack.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
     });
-    /** Playing music in Main Menu*/
-    playMainTheme(); 
-    /**Creating Button volume*/
-    btnVolume = new ButtonVolume(); 
-    /**Calling a method which check action with this button*/
-    btnVolume.checkAction(); 
-    /**Add settings to volumeController*/
-    initializeVolumeSlider();  
-    /**Check start NewGame*/
-    checkOnstartGame(easy, normal, difficult); 
+    /** Playing music in Main Menu */
+    playMainTheme();
+    /** Creating Button volume */
+    btnVolume = new ButtonVolume();
+    /** Calling a method which check action with this button */
+    btnVolume.checkAction();
+    /** Add settings to volumeController */
+    initializeVolumeSlider();
+    /** Check start NewGame */
+    checkOnstartGame(easy, normal, difficult);
 
     root.getChildren().addAll(rect, menuBox, title, btnVolume, volumeslider, getImageOfBird());
     return root;
   }
 
   public static void initializeVolumeSlider() {
-    int[] coordOfVolumeSlider = {
-      W / 36, H - H / 3 - H / 30
-    };
+    int[] coordOfVolumeSlider = {W / 36, H - H / 3 - H / 30};
     volumeslider.setMin(0);
     volumeslider.setMax(1);
     volumeslider.setValue(levelOfVolume);
@@ -216,36 +216,37 @@ public class Menu extends Application {
     });
   }
 
-  private static void checkOnstartGame(	MenuItem easy, MenuItem normal,	MenuItem difficult) {
+  private static void checkOnstartGame(MenuItem easy, MenuItem normal, MenuItem difficult) {
     easy.setOnMouseClicked(new EventHandler<MouseEvent>() {
-       public void handle(MouseEvent mE) {
-         mediaPlayer.stop();
-         /** Start newGame in Easy Way*/
-         replayGameis = false;
-         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),EASYMODE, REPLAY_TXT);
-         gi.startGame(stage, W, H, EASYMODE, humanPlaying,replayGameis);
-        }
-     });
+      public void handle(MouseEvent mE) {
+        mediaPlayer.stop();
+        /** Start newGame in Easy Way */
+        replayGameis = false;
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), EASYMODE, REPLAY_TXT);
+        gi.startGame(stage, W, H, EASYMODE, humanPlaying, replayGameis);
+      }
+    });
     normal.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
-        /** Start newGame in Normal Way*/
+        /** Start newGame in Normal Way */
         replayGameis = false;
-        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),NORMALMODE, REPLAY_TXT);
-        gi.startGame(stage, W, H, NORMALMODE, humanPlaying,replayGameis);
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), NORMALMODE, REPLAY_TXT);
+        gi.startGame(stage, W, H, NORMALMODE, humanPlaying, replayGameis);
       }
     });
     difficult.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent mE) {
         mediaPlayer.stop();
-        /** Start newGame in Hard Way*/
+        /** Start newGame in Hard Way */
         replayGameis = false;
-        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE),HARDMODE, REPLAY_TXT);
-        gi.startGame(stage, W, H, HARDMODE, humanPlaying,replayGameis);
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), HARDMODE, REPLAY_TXT);
+        gi.startGame(stage, W, H, HARDMODE, humanPlaying, replayGameis);
       }
     });
   }
-  /**Playing music*/
+
+  /** Playing music */
   private static void playMainTheme() {
     String path = MAIN_THEME;
     Media media = new Media(new File(path).toURI().toString());
@@ -257,18 +258,14 @@ public class Menu extends Application {
 
   private static ImageView getImageOfBird() {
 
-    int[] sizeOfMainBird = {
-      5 * W / 18, 3 * H / 5
-    };
-    int[] coordOfMainBird = {
-      W - W / 3 + W / 18, H / 4
-    };
+    int[] sizeOfMainBird = {5 * W / 18, 3 * H / 5};
+    int[] coordOfMainBird = {W - W / 3 + W / 18, H / 4};
     int rateOfScale = 500;
     int offset = 4;
     double increase = 1.1;
 
     ImageView imgMainBird;
-    /** Loading bird in Main Menu*/
+    /** Loading bird in Main Menu */
     try (InputStream is = Files.newInputStream(Paths.get(BIRD_MAIN))) {
       imgMainBird = new ImageView(new Image(is));
       imgMainBird.setFitWidth(sizeOfMainBird[0]);
@@ -282,16 +279,14 @@ public class Menu extends Application {
       shadow.setOffsetY(offset);
 
       imgMainBird.setOnMouseEntered(event -> {
-        ScaleTransition st = new ScaleTransition(Duration.millis(rateOfScale), 
-                                                 imgMainBird);
+        ScaleTransition st = new ScaleTransition(Duration.millis(rateOfScale), imgMainBird);
         imgMainBird.setEffect(shadow);
         st.setToX(increase);
         st.setToY(increase);
         st.play();
       });
       imgMainBird.setOnMouseExited(event -> {
-        ScaleTransition st = new ScaleTransition(Duration.millis(rateOfScale),
-                                                 imgMainBird);
+        ScaleTransition st = new ScaleTransition(Duration.millis(rateOfScale), imgMainBird);
         imgMainBird.setEffect(null);
         st.setToX(1);
         st.setToY(1);
@@ -309,27 +304,24 @@ public class Menu extends Application {
         soundPlayer = new MediaPlayer(mediaSound);
         soundPlayer.setVolume(volume);
         soundPlayer.play();
-        RotateTransition rt = new RotateTransition(Duration.millis(Rduration),
-                                                   imgMainBird);
+        RotateTransition rt = new RotateTransition(Duration.millis(Rduration), imgMainBird);
         rt.setByAngle(deviation);
         rt.setCycleCount(cycle_count);
         rt.setAutoReverse(true);
         rt.play();
       });
     } catch (IOException e) {
-        System.err.println("Caught IOException: " +  e.getMessage());
-        return null;
+      System.err.println("Caught IOException: " + e.getMessage());
+      return null;
     }
     return imgMainBird;
   }
 
-  /** class ButtonVolume*/
+  /** class ButtonVolume */
   private static class ButtonVolume extends Button {
     ImageView imgVolumeButton;
     double sizeOfButton = H / 25;
-    double[] coordOfButton = {
-      H / 20, H - 2 * H / 25
-    };
+    double[] coordOfButton = {H / 20, H - 2 * H / 25};
     double prevvolume = levelOfVolume;
 
     public ButtonVolume() {
@@ -341,10 +333,11 @@ public class Menu extends Application {
         setTranslateY(coordOfButton[1]);
         setGraphic(imgVolumeButton);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage());
-          return;
+        System.err.println("Caught IOException: " + e.getMessage());
+        return;
       }
     }
+
     public void loadVolumePng() {
       try (InputStream is = Files.newInputStream(Paths.get(VOLUME_PNG))) {
         imgVolumeButton = new ImageView(new Image(is));
@@ -352,10 +345,11 @@ public class Menu extends Application {
         imgVolumeButton.setFitWidth(sizeOfButton);
         setGraphic(imgVolumeButton);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage());
-          return;
+        System.err.println("Caught IOException: " + e.getMessage());
+        return;
       }
     }
+
     public void loadNotVolumePng() {
       try (InputStream is = Files.newInputStream(Paths.get(NOT_VOLUME_PNG))) {
         imgVolumeButton = new ImageView(new Image(is));
@@ -363,19 +357,21 @@ public class Menu extends Application {
         imgVolumeButton.setFitWidth(sizeOfButton);
         setGraphic(imgVolumeButton);
       } catch (IOException e) {
-          System.err.println("Caught IOException: " +  e.getMessage()); 
-          return;
+        System.err.println("Caught IOException: " + e.getMessage());
+        return;
       }
     }
-    /** Checking on action from button*/
+
+    /** Checking on action from button */
     public void checkAction() {
       if (levelOfVolume > 0) {
         loadVolumePng();
       } else {
-          loadNotVolumePng();
+        loadNotVolumePng();
       }
       setOnAction(new EventHandler<ActionEvent>() {
-        @Override public void handle(ActionEvent event) {
+        @Override
+        public void handle(ActionEvent event) {
           if (levelOfVolume > 0) {
             loadNotVolumePng();
             prevvolume = levelOfVolume;
@@ -395,6 +391,7 @@ public class Menu extends Application {
 
   private static class SubMenu extends VBox {
     int spacing = 15;
+
     public SubMenu(MenuItem... items) {
       setSpacing(spacing);
       setLayoutX(W / 3);
@@ -403,9 +400,9 @@ public class Menu extends Application {
         getChildren().addAll(item);
       }
     }
-    double[] layout = {
-      W / 3 - W / 9, H / 3 + H / 50
-    };
+
+    double[] layout = {W / 3 - W / 9, H / 3 + H / 50};
+
     public void addMenu(MenuItem... items) {
       setSpacing(spacing);
       setLayoutX(layout[0]);
@@ -415,12 +412,11 @@ public class Menu extends Application {
       }
     }
   }
-  
+
   private static class MenuBox extends Pane {
     static SubMenu subMenu;
-    int[] coordOfRectangle = {
-      W / 3, 3 * H / 5
-    };
+    int[] coordOfRectangle = {W / 3, 3 * H / 5};
+
     public MenuBox(SubMenu subMenu) {
       MenuBox.subMenu = subMenu;
 
@@ -429,6 +425,7 @@ public class Menu extends Application {
       bg.setLayoutY(coordOfRectangle[1]);
       getChildren().addAll(bg, subMenu);
     }
+
     public void setSubMenu(SubMenu subMenu) {
       getChildren().remove(MenuBox.subMenu);
       MenuBox.subMenu = subMenu;
@@ -457,9 +454,7 @@ public class Menu extends Application {
   }
 
   private static class Title extends StackPane {
-    double[] coordOfTitle = {
-      W / 5, H / 25
-    };
+    double[] coordOfTitle = {W / 5, H / 25};
     int offset = 3;
 
     public Title(String name) {

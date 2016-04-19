@@ -6,7 +6,8 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
-/**class Wall*/
+
+/** class Wall */
 public class Wall extends Pane {
 
   Rectangle rect;
@@ -16,11 +17,9 @@ public class Wall extends Pane {
   public static final double WIDTH = 70.0;
 
   public Wall(double d) {
-    LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true,
-        CycleMethod.NO_CYCLE, new Stop[] {
-        new Stop(0, Color.GREEN), new Stop(0.3, Color.CHARTREUSE),
-        new Stop(0.6, Color.CHARTREUSE), new Stop(1, Color.GREEN)
-    });
+    LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+        new Stop[] {new Stop(0, Color.GREEN), new Stop(0.3, Color.CHARTREUSE),
+            new Stop(0.6, Color.CHARTREUSE), new Stop(1, Color.GREEN)});
     height = d;
     rect = new Rectangle(WIDTH, height);
     rect.setFill(gradient);
