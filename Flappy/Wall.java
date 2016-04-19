@@ -10,18 +10,18 @@ import javafx.scene.shape.Rectangle;
 public class Wall extends Pane {
 
   Rectangle rect;
-  int Top;
+  double top;
 
-  public int height;
-  public static final int WIDTH = 70;
+  public double height;
+  public static final double WIDTH = 70.0;
 
-  public Wall(int h) {
+  public Wall(double d) {
     LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true,
         CycleMethod.NO_CYCLE, new Stop[] {
         new Stop(0, Color.GREEN), new Stop(0.3, Color.CHARTREUSE),
         new Stop(0.6, Color.CHARTREUSE), new Stop(1, Color.GREEN)
     });
-    height = h;
+    height = d;
     rect = new Rectangle(WIDTH, height);
     rect.setFill(gradient);
     rect.setStroke(Color.BLACK);
@@ -29,15 +29,15 @@ public class Wall extends Pane {
     getChildren().add(rect);
   }
 
-  public int getWallWidth() {
+  public double getWallWidth() {
     return WIDTH;
   }
 
-  public void SetTopCoordinate(int y) {
-    Top = y;
+  public void setTopCoordinate(double d) {
+    top = d;
   }
 
-  public int GetTop() {
-    return Top;
+  public double getTop() {
+    return top;
   }
 }

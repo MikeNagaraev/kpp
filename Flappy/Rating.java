@@ -37,7 +37,8 @@ public class Rating {
       }
       filewriter.flush();
      } catch (IOException e) {
-         System.err.println("Caught IOException: " +  e.getMessage());}
+         System.err.println("Caught IOException: " +  e.getMessage());
+     }
   }
 
   public static String getResult(int mode) {
