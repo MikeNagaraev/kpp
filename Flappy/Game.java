@@ -7,13 +7,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -31,7 +29,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /** Class NewGameInterface */
-public class NewGameInterface {
+public class Game {
 
   public Stage gamestage;
   public Scene scene;
@@ -107,8 +105,6 @@ public class NewGameInterface {
       modeOfGame = m;
     } else {
       modeOfGame = fw.readModeFromFile(REPLAY_TXT);
-    }
-    if (replayGame) {
       flagExit = false;
       flagStop = true;
       replay.start(this);
@@ -120,7 +116,7 @@ public class NewGameInterface {
       @Override
       public void handle(long now) {
         update();
-        counterOfTime = counterOfTime + 0.0001;
+        counterOfTime = counterOfTime + 0.001;
       }
     };
     /** start time */
@@ -557,7 +553,7 @@ public class NewGameInterface {
 
   /** check collision for bot */
   void checkColissionForBot() {
-    if (bird.getGraphics().getTranslateY() + hole / 2 > walls.get(wallsPassed + 1).getTop()) {
+    if (bird.getGraphics().getTranslateY() + 2 * hole / 5 > walls.get(wallsPassed + 1).getTop()) {
       jumpflappy();
       return;
     }

@@ -134,11 +134,7 @@ public class FileWorking {
     try {
       BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
       s = in.readLine();
-      if (s == null) {
-        fileIsNotEmpty = false;
-      } else {
-        fileIsNotEmpty = true;
-      }
+      fileIsNotEmpty = (s == null) ? false:true;
       in.close();
     } catch (IOException e) {
       System.err.println("Caught IOException: " + e.getMessage());
