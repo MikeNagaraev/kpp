@@ -66,8 +66,8 @@ public class Menu extends Application {
   /**For volume managing*/
   static Slider volumeslider = new Slider(); 
   /**Initial level of volume*/
-  static double level_Of_volume = 0.2;  
-  public static ButtonVolume btn_volume;
+  static double levelOfVolume = 0.2;  
+  public static ButtonVolume btnVolume;
 
   public static final int EASYMODE = 0;
   public static final int NORMALMODE = 1;
@@ -138,9 +138,9 @@ public class Menu extends Application {
     MenuItem easyResult = new MenuItem("BEST EASY :" + Rating.getResult(EASYMODE));
     MenuItem normalResult = new MenuItem("BEST NORMAL :" + Rating.getResult(NORMALMODE));
     MenuItem difficultResult = new MenuItem("BEST DIFFICULT :" + Rating.getResult(HARDMODE));
-    MenuItem Back = new MenuItem("BACK");
+    MenuItem back = new MenuItem("BACK");
     SubMenu statisticsMenu = new SubMenu();
-    statisticsMenu.addMenu(easyResult, normalResult, difficultResult,Back);
+    statisticsMenu.addMenu(easyResult, normalResult, difficultResult,back);
     /** Initial Setting a MainMenu*/
     menuBox = new MenuBox(mainMenu);
 
@@ -177,7 +177,7 @@ public class Menu extends Application {
       System.exit(0);
     }); // Exit from Game
     /** Return to MainMenu*/
-    Back.setOnMouseClicked(event -> {
+    back.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
     }); 
     /** Return to MainMenu*/
@@ -187,15 +187,15 @@ public class Menu extends Application {
     /** Playing music in Main Menu*/
     playMainTheme(); 
     /**Creating Button volume*/
-    btn_volume = new ButtonVolume(); 
+    btnVolume = new ButtonVolume(); 
     /**Calling a method which check action with this button*/
-    btn_volume.checkAction(); 
+    btnVolume.checkAction(); 
     /**Add settings to volumeController*/
     initializeVolumeSlider();  
     /**Check start NewGame*/
     checkOnstartGame(easy, normal, difficult); 
 
-    root.getChildren().addAll(rect, menuBox, title, btn_volume, volumeslider, getImageOfBird());
+    root.getChildren().addAll(rect, menuBox, title, btnVolume, volumeslider, getImageOfBird());
     return root;
   }
 
@@ -205,14 +205,14 @@ public class Menu extends Application {
     };
     volumeslider.setMin(0);
     volumeslider.setMax(1);
-    volumeslider.setValue(level_Of_volume);
+    volumeslider.setValue(levelOfVolume);
     volumeslider.setOrientation(Orientation.VERTICAL);
     volumeslider.setTranslateX(coordOfVolumeSlider[0]);
     volumeslider.setTranslateY(coordOfVolumeSlider[1]);
     volumeslider.valueProperty().addListener((ov, old_val, new_val) -> {
       mediaPlayer.setVolume((double) new_val);
-      level_Of_volume = (double) new_val;
-      btn_volume.checkAction();
+      levelOfVolume = (double) new_val;
+      btnVolume.checkAction();
     });
   }
 
@@ -251,7 +251,7 @@ public class Menu extends Application {
     Media media = new Media(new File(path).toURI().toString());
     mediaPlayer = new MediaPlayer(media);
     mediaPlayer.setAutoPlay(true);
-    mediaPlayer.setVolume(level_Of_volume);
+    mediaPlayer.setVolume(levelOfVolume);
     mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
   }
 
@@ -330,7 +330,7 @@ public class Menu extends Application {
     double[] coordOfButton = {
       H / 20, H - 2 * H / 25
     };
-    double prevvolume = level_Of_volume;
+    double prevvolume = levelOfVolume;
 
     public ButtonVolume() {
       try (InputStream is = Files.newInputStream(Paths.get(VOLUME_PNG))) {
@@ -369,24 +369,24 @@ public class Menu extends Application {
     }
     /** Checking on action from button*/
     public void checkAction() {
-      if (level_Of_volume > 0) {
+      if (levelOfVolume > 0) {
         loadVolumePng();
       } else {
           loadNotVolumePng();
       }
       setOnAction(new EventHandler<ActionEvent>() {
         @Override public void handle(ActionEvent event) {
-          if (level_Of_volume > 0) {
+          if (levelOfVolume > 0) {
             loadNotVolumePng();
-            prevvolume = level_Of_volume;
-            level_Of_volume = 0;
-            volumeslider.setValue(level_Of_volume);
-            mediaPlayer.setVolume(level_Of_volume);
+            prevvolume = levelOfVolume;
+            levelOfVolume = 0;
+            volumeslider.setValue(levelOfVolume);
+            mediaPlayer.setVolume(levelOfVolume);
           } else {
             loadVolumePng();
-            level_Of_volume = prevvolume;
-            volumeslider.setValue(level_Of_volume);
-            mediaPlayer.setVolume(level_Of_volume);
+            levelOfVolume = prevvolume;
+            volumeslider.setValue(levelOfVolume);
+            mediaPlayer.setVolume(levelOfVolume);
           }
         }
       });
@@ -403,12 +403,11 @@ public class Menu extends Application {
         getChildren().addAll(item);
       }
     }
-    int add_spacing = 15;
     double[] layout = {
       W / 3 - W / 9, H / 3 + H / 50
     };
     public void addMenu(MenuItem... items) {
-      setSpacing(add_spacing);
+      setSpacing(spacing);
       setLayoutX(layout[0]);
       setLayoutY(layout[1]);
       for (MenuItem item : items) {
