@@ -23,6 +23,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -130,6 +132,12 @@ public class Menu extends Application {
     MenuItem exitGame = new MenuItem("EXIT");
     mainMenu = new SubMenu(newGame, botGame, replayGame, statistics, exitGame);
 
+    // MenuItem load = new MenuItem("LOAD");
+    // MenuItem sortJava = new MenuItem("SORTJAVA");
+    // MenuItem sortScala = new MenuItem("SORTSCALA");
+    // MenuItem backFromReplay = new MenuItem("BACK");
+    // SubMenu replayMenu = new SubMenu(load, sortJava, sortScala, backFromReplay);
+
     MenuItem easy = new MenuItem("EASY");
     MenuItem normal = new MenuItem("NORMAL");
     MenuItem difficult = new MenuItem("HARD");
@@ -163,11 +171,12 @@ public class Menu extends Application {
     });
     replayGame.setOnMouseClicked(new EventHandler<MouseEvent>() {
       public void handle(MouseEvent me) {
-        replayGameis = true;
-        humanPlaying = true;
-        mediaPlayer.stop();
-        int mode = 0;
-        game.startGame(stage, W, H, mode, humanPlaying, replayGameis);
+        /*
+         * replayGameis = true; humanPlaying = true; mediaPlayer.stop(); int mode = 0;
+         * game.startGame(stage, W, H, mode, humanPlaying, replayGameis);
+         */
+        // menuBox.setSubMenu(replayMenu);
+        root.getChildren().addAll(loadSavesReplaysBox());
       }
     });
 
@@ -186,6 +195,7 @@ public class Menu extends Application {
     complexBack.setOnMouseClicked(event -> {
       menuBox.setSubMenu(mainMenu);
     });
+
     /** Playing music in Main Menu */
     playMainTheme();
     /** Creating Button volume */
@@ -199,6 +209,82 @@ public class Menu extends Application {
 
     root.getChildren().addAll(rect, menuBox, title, btnVolume, volumeslider, getImageOfBird());
     return root;
+  }
+
+  private static VBox[] loadSavesReplaysBox() {
+    menuBox.getChildren().clear();
+    ListView<String> listView;
+    listView = new ListView<>();
+    VBox[] controlAndViewBox = new VBox[2];
+    controlAndViewBox[0] = new VBox(4);
+    controlAndViewBox[1] = new VBox(1);
+    File[] saveFiles = fw.getSaveList();
+    for (int i = 0; i < saveFiles.length; i++) {
+      listView.getItems().add(saveFiles[i].getName());
+    }
+    listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+    MenuItem buttonLoad = new MenuItem("Load");
+    MenuItem buttonJavaSort = new MenuItem("JavaSort");
+    MenuItem buttonScalaSort = new MenuItem("ScalaSort");
+    MenuItem buttonBack = new MenuItem("Back");
+    controlAndViewBox[0].setAlignment(Pos.CENTER);
+    controlAndViewBox[0].setTranslateX(W / 8);
+    controlAndViewBox[0].setTranslateY(H / 4);
+    controlAndViewBox[0].setPrefHeight(H / 2);
+    controlAndViewBox[0].getChildren().addAll(buttonLoad, buttonJavaSort, buttonScalaSort,
+        buttonBack);
+
+    controlAndViewBox[1].setAlignment(Pos.CENTER);
+    controlAndViewBox[1].setTranslateX(2 * W / 5);
+    controlAndViewBox[1].setTranslateY(H / 4);
+    controlAndViewBox[1].setPrefHeight(H / 2);
+    controlAndViewBox[1].getChildren().addAll(listView);
+
+    buttonLoad.setOnMouseClicked(event -> {
+      String choise;
+      choise = listView.getSelectionModel().getSelectedItem();
+      if (choise != null) {
+        replayGameis = true;
+        humanPlaying = true;
+        mediaPlayer.stop();
+        int mode = 0;
+        game.startGame(stage, W, H, mode, humanPlaying, replayGameis,choise);
+      }
+    });
+    buttonScalaSort.setOnMouseClicked(event -> {
+      long timeScala = System.currentTimeMillis();
+      listView.getItems().clear();
+      File[] sortedFiles = fw.getSortedScalaList();
+      for (int i = 0; i < 10; i++) {
+        sortedFiles = fw.getSortedScalaList();
+      }
+      for (int i = 0; i < sortedFiles.length; i++) {
+        listView.getItems().add(sortedFiles[i].getName());
+      }
+      timeScala = System.currentTimeMillis() - timeScala;
+      System.out.println("Scala: " + timeScala);
+    });
+    buttonJavaSort.setOnMouseClicked(event -> {
+      long timeJava = System.currentTimeMillis();
+      listView.getItems().clear();
+      File[] sortedFiles = fw.getSortedJavaList();
+      for (int i = 0; i < 10; i++) {
+        sortedFiles = fw.getSortedJavaList();
+      }
+      for (int i = 0; i < sortedFiles.length; i++) {
+        listView.getItems().add(sortedFiles[i].getName());
+      }
+      timeJava = System.currentTimeMillis() - timeJava;
+      System.out.println("Java: " + timeJava);
+    });
+
+    buttonBack.setOnMouseClicked(event -> {
+      controlAndViewBox[0].getChildren().clear();
+      controlAndViewBox[1].getChildren().clear();
+      menuBox.setSubMenu(mainMenu);
+    });
+    return controlAndViewBox;
+
   }
 
   public static void initializeVolumeSlider() {
@@ -223,7 +309,7 @@ public class Menu extends Application {
         /** Start newGame in Easy Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), EASYMODE, REPLAY_TXT);
-        game.startGame(stage, W, H, EASYMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, EASYMODE, humanPlaying, replayGameis, "");
       }
     });
     normal.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -232,7 +318,7 @@ public class Menu extends Application {
         /** Start newGame in Normal Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), NORMALMODE, REPLAY_TXT);
-        game.startGame(stage, W, H, NORMALMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, NORMALMODE, humanPlaying, replayGameis, "");
       }
     });
     difficult.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -241,7 +327,7 @@ public class Menu extends Application {
         /** Start newGame in Hard Way */
         replayGameis = false;
         fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), HARDMODE, REPLAY_TXT);
-        game.startGame(stage, W, H, HARDMODE, humanPlaying, replayGameis);
+        game.startGame(stage, W, H, HARDMODE, humanPlaying, replayGameis, "");
       }
     });
   }
@@ -388,7 +474,7 @@ public class Menu extends Application {
   }
 
   private static class SubMenu extends VBox {
-    int spacing = 15;
+    int spacing = 10;
 
     public SubMenu(MenuItem... items) {
       setSpacing(spacing);
@@ -417,7 +503,6 @@ public class Menu extends Application {
 
     public MenuBox(SubMenu subMenu) {
       MenuBox.subMenu = subMenu;
-
       Rectangle bg = new Rectangle();
       bg.setLayoutX(coordOfRectangle[0]);
       bg.setLayoutY(coordOfRectangle[1]);

@@ -9,9 +9,6 @@ import java.util.Random;
 import java.util.Timer;
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
-import javafx.animation.TranslateTransition;
 import javafx.scene.Scene;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -26,10 +23,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 /** Class NewGameInterface */
-public class Game {
+public class Game implements Runnable {
 
   public Stage gamestage;
   public Scene scene;
@@ -45,9 +41,6 @@ public class Game {
   public static boolean humanPlaying;
 
   public Bird bird;
-  TranslateTransition jump;
-  TranslateTransition fall;
-  RotateTransition rotator;
 
   public static ArrayList<Wall> walls = new ArrayList<>();
   public static final int DISTANSE_BETWEEN_WALLS = 300;
@@ -56,7 +49,6 @@ public class Game {
   public int numberWalls;
   public int wallsPassed = 0;
   public int hole;
-  public int counter = 0;
 
   public static int score = 0;
   public static Score scoreLabel = new Score("" + score);
@@ -69,7 +61,7 @@ public class Game {
 
   public boolean gameOver = false;
   boolean pauseGame = false;
-
+  Text helpTextDownPause = new Text();
   public int rateOfWalls;
   public static final int RATE_OF_WALLS_EASY = 3;
   public static final int RATE_OF_WALLS_NORM = 4;
@@ -88,6 +80,7 @@ public class Game {
 
   FileWorking fw = new FileWorking();
   public static final String REPLAY_TXT = "replay.txt";
+  public String fileFromLoad;
   static ReplayEnum re;
   double counterOfTime = 0;
   boolean flagStop = false;
@@ -95,7 +88,8 @@ public class Game {
   Timer time = new java.util.Timer();
   Replay replay = new Replay();
 
-  public void startGame(Stage stage, int w, int h, int m, boolean _hp, boolean rp) {
+  public void startGame(Stage stage, int w, int h, int m, boolean _hp, boolean rp,
+      String fileFromLoading) {
     widthScreen = w;
     heightScreen = h;
     humanPlaying = _hp;
@@ -104,25 +98,52 @@ public class Game {
     if (!replayGame) {
       modeOfGame = m;
     } else {
-      modeOfGame = fw.readModeFromFile(REPLAY_TXT);
+      this.fileFromLoad = fileFromLoading;
+      modeOfGame = fw.readModeFromFile(fileFromLoad);
       flagExit = false;
-      flagStop = true;
-      replay.start(this);
+      flagStop = false;
     }
-    /** Checking on easy,etc. game */
+    run();
+    if (replayGame) {
+      replay.start(this, bird, fileFromLoad);
+    }
+  }
+
+  @Override
+  public void run() {
     checkOnMode();
     counterOfTime = 0;
     timer = new AnimationTimer() {
       @Override
       public void handle(long now) {
         update();
-        counterOfTime = counterOfTime + 0.001;
+        if (!replayGame) {
+          counterOfTime = counterOfTime + 0.001;
+        }
       }
     };
     /** start time */
     timer.start();
-
     newGameContent();
+    setActionOnScene();
+    gamestage.setScene(scene);
+    gamestage.show();
+    if (!replayGame) {
+      scene.setOnMouseClicked(e -> {
+        if (!gameOver) {
+          if (humanPlaying) {
+            fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
+            fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), REPLAY_TXT);
+            bird.jumpflappy();
+          }
+        } else {
+            intitalAddingItemesToGame();
+        }
+      });
+    }
+  }
+
+  private void setActionOnScene() {
 
     scene = new Scene(appRoot, widthScreen, heightScreen);
     scene.setOnKeyReleased(event -> {
@@ -130,6 +151,11 @@ public class Game {
         if (!replayGame) {
           fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
           fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), REPLAY_TXT);
+          try {
+            fw.saveFile(REPLAY_TXT, score);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
         if (replayGame) {
           replay.refreshReplay();
@@ -144,32 +170,15 @@ public class Game {
           if (pauseGame) {
             appRoot.getChildren().removeAll(pauseText[0], pauseText[1]);
             pauseGame = false;
-            if (replayGame) {
-              replay.timer.start();
-            }
-            fall.play();
-            rotator.play();
-            timer.start();
+            startAll();
           } else {
             printPause();
-            pauseGame();
+            stopAll();
+            pauseGame = true;
           }
         }
       }
     });
-    gamestage.setScene(scene);
-    gamestage.show();
-    if (!replayGame) {
-      scene.setOnMouseClicked(e -> {
-        if (!gameOver) {
-          if (humanPlaying) {
-            jumpflappy();
-          }
-        } else {
-          intitalAddingItemesToGame();
-        }
-      });
-    }
   }
 
   private void checkOnMode() {
@@ -197,12 +206,10 @@ public class Game {
     if (!replayGame) {
       fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
       fw.writeInFile(ReplayEnum.getType(ReplayEnum.GAMEOVER), REPLAY_TXT);
-    }
-    if (!replayGame) {
       counterOfTime = 0;
     }
     if (replayGame) {
-      flagStop = false;
+      flagStop = true;
     }
 
     int[] sizeOfresultPane = {widthScreen / 3, 5 * heightScreen / 2};
@@ -273,6 +280,16 @@ public class Game {
     resultPane.getChildren().addAll(rect, myScore, bestScore);
     resultPane.getChildren().addAll(el, goText);
     appRoot.getChildren().addAll(resultPane);
+    if(!humanPlaying){
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), REPLAY_TXT);
+      try {
+        fw.saveFile(REPLAY_TXT, score);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      intitalAddingItemesToGame();
+    }
   }
 
   private String getString(int a) {
@@ -328,39 +345,12 @@ public class Game {
     gamestage.show();
   }
 
-  /** setting a pause */
-  private void pauseGame() {
-    if (!pauseGame) {
-      timer.stop();
-      fall.stop();
-      rotator.stop();
-      jump.stop();
-      pauseGame = true;
-      if (replayGame) {
-        replay.timer.stop();
-      }
-    }
-  }
-
   /** Pushing items to Scene */
   private void newGameContent() {
-
-    int[] rateOfJump = {350, 300, 280};
-    int[] rateOfFall = {1800, 1500, 1300};
-    int rateOfRotate = 100;
-    int fallDistance = heightScreen + 20;
-
     appRoot = new Pane();
     appRoot.setPrefSize(widthScreen, heightScreen);
     appRoot.setStyle("-fx-background-color: #4EC0CA");
-    bird = new Bird();
-    rotator = new RotateTransition(Duration.millis(rateOfRotate), bird.getGraphics());
-    jump = new TranslateTransition(Duration.millis(rateOfJump[modeOfGame]), bird.getGraphics());
-    fall = new TranslateTransition(Duration.millis(rateOfFall[modeOfGame]), bird.getGraphics());
-    jump.setInterpolator(Interpolator.LINEAR);
-    fall.setByY(fallDistance);
-    rotator.setCycleCount(1);
-
+    bird = new Bird(modeOfGame);
     appRoot.getChildren().addAll(bird.getGraphics(), scoreLabel);
     intitalAddingItemesToGame();
   }
@@ -369,13 +359,12 @@ public class Game {
   public void update() {
 
     double rateOfSun = 0.3;
-    int numberOfFramesOfBird = 4;
 
     if (replayGame && flagExit) {
       backToMenu();
     }
+    /** Checking disappearing of walls */
     for (Wall w : walls) {
-      w.setTranslateX(w.getTranslateX() - rateOfWalls);
       if (w.getTranslateX() + w.getWallWidth() < 0) {
         walls.remove(w);
         wallsPassed--;
@@ -389,7 +378,7 @@ public class Game {
         break;
       }
     }
-    /** Creating a clouds */
+    /** Checking disappering of clouds */
     for (int i = 0; i < NUMBER_OF_CLOUDS; i++) {
       if (cloud[i].getTranslateX() + cloud[i].getFitWidth() < 0) {
         cloud[i].setTranslateX(widthScreen);
@@ -401,15 +390,30 @@ public class Game {
     } else {
       sun.setTranslateX(sun.getTranslateX() - rateOfSun);
     }
-    if (counter % numberOfFramesOfBird == 0) {
-      bird.updateBird();
-      counter = 1;
-    }
-    counter++;
-
     scoreLabel.setText("" + score);
-
     checkColission();
+  }
+
+  public void stopAll() {
+    if (replayGame) {
+      replay.timer.stop();
+    }
+    timer.stop();
+    bird.stopBird();
+    for (Wall w : walls) {
+      w.stopWall();
+    }
+  }
+
+  public void startAll() {
+    if (replayGame) {
+      replay.timer.start();
+    }
+    timer.start();
+    bird.startBird();
+    for (Wall w : walls) {
+      w.startWall();
+    }
   }
 
   void addWallFromReplay(int numberOfLines) {
@@ -417,10 +421,10 @@ public class Game {
     final int COORD_Y_FILE = 0;
     final int HEIGHT_FILE = 1;
 
-    int heightTopWall = (int) fw.readFromFile(REPLAY_TXT, numberOfLines)[HEIGHT_FILE];
-    int heightDownWall = (int) fw.readFromFile(REPLAY_TXT, numberOfLines + 1)[HEIGHT_FILE];
-    Wall wTop = new Wall(heightTopWall);
-    Wall wDown = new Wall(heightDownWall);
+    int heightTopWall = (int) fw.readFromFile(fileFromLoad, numberOfLines)[HEIGHT_FILE];
+    int heightDownWall = (int) fw.readFromFile(fileFromLoad, numberOfLines + 1)[HEIGHT_FILE];
+    Wall wTop = new Wall(heightTopWall, rateOfWalls);
+    Wall wDown = new Wall(heightDownWall, rateOfWalls);
     if (numberWalls == 0) {
       wTop.setTranslateX(widthScreen);
       wDown.setTranslateX(widthScreen);
@@ -429,8 +433,8 @@ public class Game {
       wDown.setTranslateX((walls.get(numberWalls - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
     }
 
-    wTop.setTopCoordinate(fw.readFromFile(REPLAY_TXT, numberOfLines)[HEIGHT_FILE]);
-    wTop.setTranslateY(fw.readFromFile(REPLAY_TXT, numberOfLines)[COORD_Y_FILE]);
+    wTop.setTopCoordinate(fw.readFromFile(fileFromLoad, numberOfLines)[HEIGHT_FILE]);
+    wTop.setTranslateY(fw.readFromFile(fileFromLoad, numberOfLines)[COORD_Y_FILE]);
     walls.add(wTop);
     numberWalls++;
 
@@ -457,15 +461,12 @@ public class Game {
       heightTop = maxHeight;
     }
     int heightDown = rangeOfWallHeight - heightTop;
-    if (score % 4 == 0 && score > 0) {
-      heightDown = new Random().nextInt(200);
-    }
-    if (heightDown < minHeight) {
-      heightDown = minHeight;
+    if (score % 3 == 0 && score > 0) {
+      heightDown += new Random().nextInt(200);
     }
 
-    Wall wTop = new Wall(heightTop);
-    Wall wDown = new Wall(heightDown);
+    Wall wTop = new Wall(heightTop, rateOfWalls);
+    Wall wDown = new Wall(heightDown, rateOfWalls);
     if (numberWalls == 0) {
       wTop.setTranslateX(widthScreen);
       wDown.setTranslateX(widthScreen);
@@ -489,6 +490,7 @@ public class Game {
     numberWalls++;
 
     appRoot.getChildren().addAll(wTop, wDown);
+
   }
 
   /** Check Bird collision with ground,walls,sky, etc. */
@@ -500,15 +502,19 @@ public class Game {
     }
     double wallWidth = walls.get(wallsPassed).getWallWidth();
 
+
+    /** CHECK IF PLAYS BOT */
     if (!humanPlaying) {
       checkColissionForBot();
     }
+    /** CHECK IF PLAYS HUMAN */
+
     /** With LeftSide */
     if (bird.getGraphics().getBoundsInParent()
         .intersects(walls.get(wallsPassed).getBoundsInParent())
         || bird.getGraphics().getBoundsInParent()
             .intersects(walls.get(wallsPassed + 1).getBoundsInParent())) {
-      timer.stop();
+      stopAll();
       gameOver = true;
       printResult();
       return;
@@ -521,7 +527,7 @@ public class Game {
             && bird.getGraphics().getTranslateX() <= walls.get(wallsPassed + 1).getTranslateX()
                 + wallWidth
             && bird.getGraphics().getTranslateY() > walls.get(wallsPassed + 1).getTop()) {
-      timer.stop();
+      stopAll();
       gameOver = true;
       printResult();
       return;
@@ -537,8 +543,8 @@ public class Game {
     }
     /** With ground */
     if (bird.getGraphics().getTranslateY() + bird.getHeight() > boundOfGroundY) {
-      timer.stop();
-      fall.stop();
+      stopAll();
+      bird.startFall();
       gameOver = true;
       printResult();
       return;
@@ -546,7 +552,7 @@ public class Game {
     /** With Sky */
     if (bird.getGraphics().getTranslateY() < 0) {
       bird.getGraphics().setTranslateY(bird.getGraphics().getTranslateY() - 2);
-      fall.play();
+      bird.startFall();
       return;
     }
   }
@@ -554,35 +560,48 @@ public class Game {
   /** check collision for bot */
   void checkColissionForBot() {
     if (bird.getGraphics().getTranslateY() + 2 * hole / 5 > walls.get(wallsPassed + 1).getTop()) {
-      jumpflappy();
+      if (!replayGame) {
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), REPLAY_TXT);
+      }
+      bird.jumpflappy();
       return;
     }
   }
 
   /** refresh items and pushing again */
   void intitalAddingItemesToGame() {
-
     if (!replayGame) {
       fw.freeFiles(REPLAY_TXT);
       fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), modeOfGame, REPLAY_TXT);
     }
-    double[] coordOfBird = {widthScreen / 6, 3 * heightScreen / 10};
-    int[] coordOfSun = {widthScreen / 2, 0};
-    int[] sizeOfSun = {3 * heightScreen / 20, 3 * heightScreen / 20};
-    int randNumX = 700;
-    int randNumY = 20;
-    int distX = 100;
-    int distY = 10;
-    int[] sizeOfCloud = {widthScreen / 3, heightScreen / 5};
-
     walls.clear();
     appRoot.getChildren().clear();
+    scoreLabel.setText("0");
+    wallsPassed = 0;
+    score = 0;
+    gameOver = false;
+    settingLayoutBird();
+    settingLayoutSun();
+    settingLayoutClouds();
+    settingLayoutWalls();
+    loadGroundPicture();
+    loadPauseText();
+    bird.stopAndPlayBird();
+    timer.start();
+    appRoot.getChildren().addAll(groundview, bird.getGraphics(), scoreLabel, helpTextDownPause);
+  }
+
+  public void settingLayoutBird() {
+    double[] coordOfBird = {widthScreen / 6, 3 * heightScreen / 10};
     bird.getGraphics().setTranslateX(coordOfBird[0]);
     bird.getGraphics().setTranslateY(coordOfBird[1]);
-    scoreLabel.setText("0");
-    sun = new ImageView();
-    groundview = new ImageView();
+  }
 
+  public void settingLayoutSun() {
+    int[] coordOfSun = {widthScreen / 2, 0};
+    int[] sizeOfSun = {3 * heightScreen / 20, 3 * heightScreen / 20};
+    sun = new ImageView();
     try (InputStream is = Files.newInputStream(Paths.get(SUN_PICTURE))) {
       sun = new ImageView(new Image(is));
       sun.setTranslateX(coordOfSun[0]);
@@ -595,7 +614,14 @@ public class Game {
       return;
     }
     appRoot.getChildren().addAll(sun);
+  }
 
+  public void settingLayoutClouds() {
+    int[] sizeOfCloud = {widthScreen / 3, heightScreen / 5};
+    int randNumX = 700;
+    int randNumY = 20;
+    int distX = 100;
+    int distY = 10;
     /** Setting a layout of clouds */
     for (int i = 0; i < NUMBER_OF_CLOUDS; i++) {
       try (InputStream is = Files.newInputStream(Paths.get(CLOUD_PICTURE))) {
@@ -611,7 +637,9 @@ public class Game {
         return;
       }
     }
+  }
 
+  private void settingLayoutWalls() {
     /** Setting a layout of walls */
     numberWalls = 0;
     if (!replayGame) {
@@ -619,8 +647,20 @@ public class Game {
         addWall();
       }
     }
-    int[] coordXofGround = {0, 4 * heightScreen / 5 - 1};
+  }
 
+  private void loadPauseText() {
+    double[] coordOfHelpingText = {20, heightScreen - 2 * heightScreen / 25};
+    helpTextDownPause.setText("F10 - Pause\nEsc - Back To Menu");
+    helpTextDownPause.setTranslateX(coordOfHelpingText[0]);
+    helpTextDownPause.setTranslateY(coordOfHelpingText[1]);
+    helpTextDownPause.setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, 20));
+    helpTextDownPause.setFill(Color.WHITE);
+  }
+
+  private void loadGroundPicture() {
+    int[] coordXofGround = {0, 4 * heightScreen / 5 - 1};
+    groundview = new ImageView();
     try (InputStream is = Files.newInputStream(Paths.get(GROUND_PICTURE))) {
       groundview = new ImageView(new Image(is));
       groundview.setTranslateX(coordXofGround[0]);
@@ -631,56 +671,5 @@ public class Game {
       System.err.println("Caught IOException: " + e.getMessage());
       return;
     }
-
-    double[] coordOfHelpingText = {20, heightScreen - 2 * heightScreen / 25};
-
-    Text helpTextDown = new Text();
-    helpTextDown.setText("F10 - Pause\nEsc - Back To Menu");
-    helpTextDown.setTranslateX(coordOfHelpingText[0]);
-    helpTextDown.setTranslateY(coordOfHelpingText[1]);
-    helpTextDown.setFont(Font.font(Font.getDefault().getName(), FontWeight.BOLD, 20));
-    helpTextDown.setFill(Color.WHITE);
-
-    wallsPassed = 0;
-    score = 0;
-    gameOver = false;
-    rotator.stop();
-    rotator.setToAngle(0);
-    rotator.play();
-    fall.stop();
-    fall.play();
-    timer.start();
-    appRoot.getChildren().addAll(groundview, bird.getGraphics(), scoreLabel, helpTextDown);
-  }
-
-  /** Jump method for bird */
-  public void jumpflappy() {
-    if (!replayGame) {
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), REPLAY_TXT);
-    }
-    int rotateAngleFall = 40;
-    int rotateAngleJump = -40;
-    int jumpHeight = -60;
-    int rateOfFallRotate = 300;
-
-    rotator.setDuration(Duration.millis(100));
-    rotator.setToAngle(rotateAngleJump);
-    rotator.stop();
-    rotator.play();
-    jump.setByY(jumpHeight);
-    jump.setCycleCount(1);
-
-    fall.stop();
-    jump.stop();
-    jump.play();
-
-    jump.setOnFinished((finishedEvent) -> {
-      rotator.setDuration(Duration.millis(rateOfFallRotate));
-      rotator.setToAngle(rotateAngleFall);
-      rotator.stop();
-      rotator.play();
-      fall.play();
-    });
   }
 }
