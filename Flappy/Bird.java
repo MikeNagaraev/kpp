@@ -127,7 +127,7 @@ public class Bird implements Runnable {
   public void jumpflappy() {
     int rotateAngleFall = 40;
     int rotateAngleJump = -40;
-    int jumpHeight = -50;
+    int jumpHeight = -40;
     int rateOfFallRotate = 300;
 
     rotator.setDuration(Duration.millis(100));

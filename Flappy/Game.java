@@ -46,11 +46,12 @@ public class Game implements Runnable {
   public static final int DISTANSE_BETWEEN_WALLS = 300;
   public static final int NUMBER_OF_WALLS = 4;
   public static final int NUMBER_OF_CLOUDS = 5;
-  public int numberWalls;
+  public int wallNumber;
   public int wallsPassed = 0;
   public int hole;
 
   public static int score = 0;
+  public int numOfWalls = 0;
   public static Score scoreLabel = new Score("" + score);
 
   public ImageView groundview, sun;
@@ -65,21 +66,20 @@ public class Game implements Runnable {
   public int rateOfWalls;
   public static final int RATE_OF_WALLS_EASY = 3;
   public static final int RATE_OF_WALLS_NORM = 4;
-  public static final int RATE_OF_WALLS_HARD = 5;
+  public static final int RATE_OF_WALLS_HARD = 6;
 
   public int modeOfGame;
   public static final int EASY_MODE = 0;
   public static final int NORMAL_MODE = 1;
   public static final int HARD_MODE = 2;
 
-  public static final int HOLE_EASY = 200;
-  public static final int HOLE_NORMAL = 180;
+  public static final int HOLE_EASY = 230;
+  public static final int HOLE_NORMAL = 210;
   public static final int HOLE_HARD = 180;
 
   public Text[] pauseText = new Text[2];
 
   FileWorking fw = new FileWorking();
-  public static final String REPLAY_TXT = "replay.txt";
   public String fileFromLoad;
   static ReplayEnum re;
   double counterOfTime = 0;
@@ -87,6 +87,7 @@ public class Game implements Runnable {
   boolean flagExit = false;
   Timer time = new java.util.Timer();
   Replay replay = new Replay();
+  String tempFile;
 
   public void startGame(Stage stage, int w, int h, int m, boolean _hp, boolean rp,
       String fileFromLoading) {
@@ -104,9 +105,6 @@ public class Game implements Runnable {
       flagStop = false;
     }
     run();
-    if (replayGame) {
-      replay.start(this, bird, fileFromLoad);
-    }
   }
 
   @Override
@@ -132,14 +130,19 @@ public class Game implements Runnable {
       scene.setOnMouseClicked(e -> {
         if (!gameOver) {
           if (humanPlaying) {
-            fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-            fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), REPLAY_TXT);
+            timer.stop();
+            fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+            fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), tempFile);
+            timer.start();
             bird.jumpflappy();
           }
         } else {
-            intitalAddingItemesToGame();
+          intitalAddingItemesToGame();
         }
       });
+    }
+    if (replayGame) {
+      replay.start(this, bird, fileFromLoad);
     }
   }
 
@@ -149,10 +152,10 @@ public class Game implements Runnable {
     scene.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE) {
         if (!replayGame) {
-          fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-          fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), REPLAY_TXT);
+          fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+          fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), tempFile);
           try {
-            fw.saveFile(REPLAY_TXT, score);
+            fw.saveFile(tempFile, score);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -204,8 +207,8 @@ public class Game implements Runnable {
   /** printing finish result */
   private void printResult() {
     if (!replayGame) {
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.GAMEOVER), REPLAY_TXT);
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.GAMEOVER), tempFile);
       counterOfTime = 0;
     }
     if (replayGame) {
@@ -280,14 +283,16 @@ public class Game implements Runnable {
     resultPane.getChildren().addAll(rect, myScore, bestScore);
     resultPane.getChildren().addAll(el, goText);
     appRoot.getChildren().addAll(resultPane);
-    if(!humanPlaying){
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), REPLAY_TXT);
+    if (!humanPlaying) {
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), tempFile);
       try {
-        fw.saveFile(REPLAY_TXT, score);
+        fw.saveFile(tempFile, score);
       } catch (Exception e) {
         e.printStackTrace();
       }
+      timer.stop();
+      counterOfTime = 0;
       intitalAddingItemesToGame();
     }
   }
@@ -368,9 +373,9 @@ public class Game implements Runnable {
       if (w.getTranslateX() + w.getWallWidth() < 0) {
         walls.remove(w);
         wallsPassed--;
-        numberWalls--;
+        wallNumber--;
         // two walls passed
-        if (numberWalls % 2 == 0) {
+        if (wallNumber % 2 == 0) {
           if (!replayGame) {
             addWall();
           }
@@ -425,23 +430,23 @@ public class Game implements Runnable {
     int heightDownWall = (int) fw.readFromFile(fileFromLoad, numberOfLines + 1)[HEIGHT_FILE];
     Wall wTop = new Wall(heightTopWall, rateOfWalls);
     Wall wDown = new Wall(heightDownWall, rateOfWalls);
-    if (numberWalls == 0) {
+    if (wallNumber == 0) {
       wTop.setTranslateX(widthScreen);
       wDown.setTranslateX(widthScreen);
     } else {
-      wTop.setTranslateX((walls.get(numberWalls - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
-      wDown.setTranslateX((walls.get(numberWalls - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
+      wTop.setTranslateX((walls.get(wallNumber - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
+      wDown.setTranslateX((walls.get(wallNumber - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
     }
 
     wTop.setTopCoordinate(fw.readFromFile(fileFromLoad, numberOfLines)[HEIGHT_FILE]);
     wTop.setTranslateY(fw.readFromFile(fileFromLoad, numberOfLines)[COORD_Y_FILE]);
     walls.add(wTop);
-    numberWalls++;
+    wallNumber++;
 
     wDown.setTopCoordinate(4 * heightScreen / 5 - heightDownWall);
     wDown.setTranslateY(4 * heightScreen / 5 - heightDownWall);
     walls.add(wDown);
-    numberWalls++;
+    wallNumber++;
 
     appRoot.getChildren().addAll(wTop, wDown);
   }
@@ -461,33 +466,34 @@ public class Game implements Runnable {
       heightTop = maxHeight;
     }
     int heightDown = rangeOfWallHeight - heightTop;
-    if (score % 3 == 0 && score > 0) {
+    if (numOfWalls % 10 == 0 && numOfWalls > 0) {
       heightDown += new Random().nextInt(200);
     }
 
     Wall wTop = new Wall(heightTop, rateOfWalls);
     Wall wDown = new Wall(heightDown, rateOfWalls);
-    if (numberWalls == 0) {
+    if (wallNumber == 0) {
       wTop.setTranslateX(widthScreen);
       wDown.setTranslateX(widthScreen);
     } else {
-      wTop.setTranslateX((walls.get(numberWalls - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
-      wDown.setTranslateX((walls.get(numberWalls - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
+      wTop.setTranslateX((walls.get(wallNumber - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
+      wDown.setTranslateX((walls.get(wallNumber - 1).getTranslateX() + DISTANSE_BETWEEN_WALLS));
     }
     wTop.setTopCoordinate(heightTop);
     wTop.setTranslateY(0);
-    fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
     walls.add(wTop);
-    fw.writeInFile(ReplayEnum.getType(ReplayEnum.WALL), wTop.getTranslateY(), heightTop,
-        REPLAY_TXT);
-    numberWalls++;
+    fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+    fw.writeInFile(ReplayEnum.getType(ReplayEnum.WALL), wTop.getTranslateY(), heightTop, tempFile);
+    wallNumber++;
+    numOfWalls++;
 
     wDown.setTopCoordinate(4 * heightScreen / 5 - heightDown);
     wDown.setTranslateY(4 * heightScreen / 5 - heightDown);
     walls.add(wDown);
     fw.writeInFile(ReplayEnum.getType(ReplayEnum.WALL), wDown.getTranslateY(), heightDown,
-        REPLAY_TXT);
-    numberWalls++;
+        tempFile);
+    wallNumber++;
+    numOfWalls++;
 
     appRoot.getChildren().addAll(wTop, wDown);
 
@@ -520,22 +526,22 @@ public class Game implements Runnable {
       return;
     }
     /** With top and bottom of walls */
-    if (bird.getGraphics().getTranslateX() >= walls.get(wallsPassed).getTranslateX()
-        && bird.getGraphics().getTranslateX() <= walls.get(wallsPassed).getTranslateX() + wallWidth
-        && bird.getGraphics().getTranslateY() < walls.get(wallsPassed).getTop()
-        || bird.getGraphics().getTranslateX() >= walls.get(wallsPassed + 1).getTranslateX()
-            && bird.getGraphics().getTranslateX() <= walls.get(wallsPassed + 1).getTranslateX()
+    if (bird.getGraphics().getTranslateX() > walls.get(wallsPassed).getTranslateX()
+        && bird.getGraphics().getTranslateX() < walls.get(wallsPassed).getTranslateX() + wallWidth
+        && bird.getGraphics().getTranslateY() < walls.get(wallsPassed).getTop() - 5
+        || bird.getGraphics().getTranslateX() > walls.get(wallsPassed + 1).getTranslateX()
+            && bird.getGraphics().getTranslateX() < walls.get(wallsPassed + 1).getTranslateX()
                 + wallWidth
-            && bird.getGraphics().getTranslateY() > walls.get(wallsPassed + 1).getTop()) {
+            && bird.getGraphics().getTranslateY() > walls.get(wallsPassed + 1).getTop() + 5) {
       stopAll();
       gameOver = true;
       printResult();
       return;
     }
     /** Incrementing Score */
-    if (bird.getGraphics().getTranslateX() >= walls.get(wallsPassed).getTranslateX() + wallWidth
+    if (bird.getGraphics().getTranslateX() >= walls.get(wallsPassed).getTranslateX() + wallWidth / 2
         && bird.getGraphics().getTranslateX() >= walls.get(wallsPassed + 1).getTranslateX()
-            + wallWidth) {
+            + wallWidth / 2) {
       scoreLabel.setText("" + score);
       score++;
       wallsPassed += 2;
@@ -561,8 +567,8 @@ public class Game implements Runnable {
   void checkColissionForBot() {
     if (bird.getGraphics().getTranslateY() + 2 * hole / 5 > walls.get(wallsPassed + 1).getTop()) {
       if (!replayGame) {
-        fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, REPLAY_TXT);
-        fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), REPLAY_TXT);
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
+        fw.writeInFile(ReplayEnum.getType(ReplayEnum.FLAPPY), tempFile);
       }
       bird.jumpflappy();
       return;
@@ -572,14 +578,16 @@ public class Game implements Runnable {
   /** refresh items and pushing again */
   void intitalAddingItemesToGame() {
     if (!replayGame) {
-      fw.freeFiles(REPLAY_TXT);
-      fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), modeOfGame, REPLAY_TXT);
+      tempFile = fw.getTempFile();
+      fw.freeFiles(tempFile);
+      fw.writeInFile(ReplayEnum.getType(ReplayEnum.MODE), modeOfGame, tempFile);
     }
     walls.clear();
     appRoot.getChildren().clear();
     scoreLabel.setText("0");
     wallsPassed = 0;
     score = 0;
+    numOfWalls = 0;
     gameOver = false;
     settingLayoutBird();
     settingLayoutSun();
@@ -641,7 +649,7 @@ public class Game implements Runnable {
 
   private void settingLayoutWalls() {
     /** Setting a layout of walls */
-    numberWalls = 0;
+    wallNumber = 0;
     if (!replayGame) {
       for (int i = 0; i < NUMBER_OF_WALLS; i++) {
         addWall();

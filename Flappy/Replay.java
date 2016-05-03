@@ -17,7 +17,7 @@ public class Replay implements Runnable {
   Bird bird;
   public AnimationTimer timer;
 
-  public void start(Game ng, Bird b,String fileFromLoad) {
+  public void start(Game ng, Bird b, String fileFromLoad) {
     this.fileFromLoad = fileFromLoad;
     newGame = ng;
     bird = b;

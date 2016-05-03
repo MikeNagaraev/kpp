@@ -153,7 +153,6 @@ public class FileWorking {
     }
   }
 
-
   public void saveFile(String oldFileName, int score) throws IOException {
     String nameOfFile =
         new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + "_"
@@ -176,6 +175,21 @@ public class FileWorking {
       e.printStackTrace();
     }
   }
+
+  public String getTempFile() {
+    String nameOfFile =
+        new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + "_"
+            + ".txt";
+    File file = new File(nameOfFile);
+    try {
+      file.createNewFile();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return nameOfFile;
+
+  }
+
   public File[] getSaveList() {
     File[] allFiles;
     File[] saveFiles;
@@ -199,7 +213,7 @@ public class FileWorking {
     }
     return saveFiles;
   }
-  
+
 
   public File[] getSortedJavaList() {
     File[] saveFiles = getSaveList();
@@ -221,9 +235,27 @@ public class FileWorking {
     qSortObject.sort(score, saveFiles);
     return saveFiles;
   }
-  
-  private int getScore(String nameOfFile) {
-    String[] mas = nameOfFile.split("_");
+
+  public int getJumps(String fileName) {
+    File file = new File(fileName);
+    String s = new String();
+    int jumps = 0;
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+      while ((s = in.readLine()) != null) {
+        if (s.equals(ReplayEnum.getType(ReplayEnum.FLAPPY))) {
+          jumps++;
+        }
+      }
+      in.close();
+    } catch (IOException e) {
+      System.err.println("Caught IOException: " + e.getMessage());
+    }
+    return jumps;
+  }
+
+  public int getScore(String fileName) {
+    String[] mas = fileName.split("_");
     mas[2] = mas[2].replace(".save", "");
     return (Integer.parseInt(mas[2]));
   }
@@ -250,9 +282,10 @@ public class FileWorking {
         i++;
         j--;
       }
-    } ;
+    };
     return i;
   }
+
   void quickSort(int arr[], File files[], int left, int right) {
     int index = dividing(arr, files, left, right);
     if (left < index - 1)
