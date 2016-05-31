@@ -5,17 +5,17 @@ public enum ReplayEnum {
   public static String getType(ReplayEnum re) {
     switch (re) {
       case MODE:
-        return "mode";
+        return "m";
       case WALL:
-        return "wall";
+        return "w";
       case FLAPPY:
-        return "flappy";
+        return "f";
       case TIME:
-        return "time";
+        return "t";
       case ESC:
-        return "esc";
+        return "e";
       case GAMEOVER:
-        return "gameover";
+        return "g";
       default:
         return null;
     }

@@ -30,6 +30,7 @@ public class Bird implements Runnable {
   int[] rateOfFall = {1800, 1500, 1300};
   final int rateOfRotate = 100;
   final int fallDistance = 500;
+  Notation notation = new Notation();
 
   FileWorking fw = new FileWorking();
   public static final String REPLAY_TXT = "replay.txt";
@@ -129,7 +130,8 @@ public class Bird implements Runnable {
     int rotateAngleJump = -40;
     int jumpHeight = -40;
     int rateOfFallRotate = 300;
-
+    
+    System.out.println(notation.parseNotation("Flappy has jumped"));    
     rotator.setDuration(Duration.millis(100));
     rotator.setToAngle(rotateAngleJump);
     rotator.stop();

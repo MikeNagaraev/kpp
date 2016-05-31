@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 
@@ -88,6 +89,9 @@ public class Game implements Runnable {
   Timer time = new java.util.Timer();
   Replay replay = new Replay();
   String tempFile;
+  
+  Notation notation = new Notation();
+  List<Double> list = new ArrayList<>();
 
   public void startGame(Stage stage, int w, int h, int m, boolean _hp, boolean rp,
       String fileFromLoading) {
@@ -283,7 +287,7 @@ public class Game implements Runnable {
     resultPane.getChildren().addAll(rect, myScore, bestScore);
     resultPane.getChildren().addAll(el, goText);
     appRoot.getChildren().addAll(resultPane);
-    if (!humanPlaying) {
+    if (!humanPlaying && !replayGame) {
       fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
       fw.writeInFile(ReplayEnum.getType(ReplayEnum.ESC), tempFile);
       try {
@@ -442,11 +446,19 @@ public class Game implements Runnable {
     wTop.setTranslateY(fw.readFromFile(fileFromLoad, numberOfLines)[COORD_Y_FILE]);
     walls.add(wTop);
     wallNumber++;
+    list.clear();
+    list.add(wTop.getTranslateX());
+    list.add(wTop.getTop());
+    System.out.println(notation.parseNotation(list));
 
     wDown.setTopCoordinate(4 * heightScreen / 5 - heightDownWall);
     wDown.setTranslateY(4 * heightScreen / 5 - heightDownWall);
     walls.add(wDown);
     wallNumber++;
+    list.clear();
+    list.add(wDown.getTranslateX());
+    list.add(wDown.getTop());
+    System.out.println(notation.parseNotation(list));
 
     appRoot.getChildren().addAll(wTop, wDown);
   }
@@ -466,7 +478,7 @@ public class Game implements Runnable {
       heightTop = maxHeight;
     }
     int heightDown = rangeOfWallHeight - heightTop;
-    if (numOfWalls % 10 == 0 && numOfWalls > 0) {
+    if (numOfWalls % 12 == 0 && numOfWalls > 0) {
       heightDown += new Random().nextInt(200);
     }
 
@@ -482,16 +494,26 @@ public class Game implements Runnable {
     wTop.setTopCoordinate(heightTop);
     wTop.setTranslateY(0);
     walls.add(wTop);
+    list.clear();
+    list.add(wTop.getTranslateX());
+    list.add(wTop.getTop());
+    System.out.println(notation.parseNotation(list));
     fw.writeInFile(ReplayEnum.getType(ReplayEnum.TIME), counterOfTime, tempFile);
     fw.writeInFile(ReplayEnum.getType(ReplayEnum.WALL), wTop.getTranslateY(), heightTop, tempFile);
     wallNumber++;
     numOfWalls++;
-
+    
+    
     wDown.setTopCoordinate(4 * heightScreen / 5 - heightDown);
     wDown.setTranslateY(4 * heightScreen / 5 - heightDown);
     walls.add(wDown);
     fw.writeInFile(ReplayEnum.getType(ReplayEnum.WALL), wDown.getTranslateY(), heightDown,
         tempFile);
+    list.clear();
+    list.add(wDown.getTranslateX());
+    list.add(wDown.getTop());
+    System.out.println(notation.parseNotation(list));
+    
     wallNumber++;
     numOfWalls++;
 
